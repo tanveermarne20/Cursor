@@ -1,7 +1,7 @@
-
 --Implicit Cursors:
 --1. These cursors are automatically created by the database management system
 --to process the result sets of SQL queries.
+
 --When you execute a SELECT statement, an implicit cursor is created by default.
 --Implicit cursors are mainly used in simple scenarios where you don't need 
 --fine-grained control over the cursor operations.
