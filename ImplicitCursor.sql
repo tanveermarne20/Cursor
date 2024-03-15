@@ -43,15 +43,41 @@ BEGIN
 END;
 
 
+--=============================10thmarch===============================
+SET SERVEROUTPUT ON
+DECLARE
+ROW_INSERTED VARCHAR2(20);
+BEGIN
+ INSERT INTO STUDENT VALUES(10,'Tanvir','Bangalore','M','90');
+ROW_INSERTED:=(SQL%ROWCOUNT||' row inserted.');
+DBMS_OUTPUT.PUT_LINE(ROW_INSERTED);
+END;
+
+SELECT *
+FROM STUDENT;
+--============================11th march====================================
+SET SERVEROUTPUT ON
+DECLARE
+ ROW_INSERTED VARCHAR2(20);
+BEGIN
+ INSERT INTO STUDENT VALUES(11,'Selvi','Chikkamangaluru','F',90);
+ ROW_INSERTED:=(SQL%ROWCOUNT||' row inserted.');
+ DBMS_OUTPUT.PUT_LINE(ROW_INSERTED);
+END;
+
+SELECT *
+FROM STUDENT;
 
 
-
-
-
-
-
-
-
-
+--==============================================
+SET SERVEROUTPUT ON
+DECLARE
+ROW_DELETED VARCHAR2(30);
+BEGIN
+DELETE FROM STUDENT
+WHERE SID=&SID;
+ROW_DELETED :=(SQL%ROWCOUNT ||' row deletedd.');
+DBMS_OUTPUT.PUT_LINE(ROW_DELETED);
+END;
 
 

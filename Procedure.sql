@@ -1,0 +1,172 @@
+SET SERVEROUTPUT ON
+CREATE OR REPLACE PROCEDURE EMP_DETAILS(DID NUMBER)
+IS
+
+CURSOR EMP_TEST
+IS
+SELECT FIRST_NAME,LAST_NAME,ROUND(MONTHS_BETWEEN(SYSDATE,HIRE_DATE)/12,0) AS EXPER
+FROM EMPLOYEES
+WHERE DEPARTMENT_ID = DID ;
+
+
+BEGIN
+FOR i in EMP_TEST -- here i become composite datatype ( record )
+LOOP
+DBMS_OUTPUT.PUT_LINE(i.FIRST_NAME||' '||i.LAST_NAME||' '||i.EXPER);
+END LOOP;
+END;
+
+EXECUTE EMP_DETAILS(50) ;
+
+--Q1 .. pass joining_year along with exp 
+--Q2.. pass job_id , print manager details
+-- Q3.. pass department_id and year_of_joining , calculate their experiecne, print salary hike
+
+
+---================================================================================
+SET SERVEROUTPUT ON
+CREATE OR REPLACE PROCEDURE EMP_DET(DID NUMBER)
+IS 
+ CURSOR EMP_CONTEXT
+ IS
+ SELECT 
+ FIRST_NAME,
+ LAST_NAME,
+ ROUND(MONTHS_BETWEEN(SYSDATE,HIRE_DATE)/12,2) AS TOTAL_EXP
+ FROM EMPLOYEES
+ WHERE DEPARTMENT_ID=DID;
+BEGIN
+ FOR I IN EMP_CONTEXT 
+ LOOP
+   DBMS_OUTPUT.PUT_LINE(I.FIRST_NAME||' '||I.LAST_NAME||' '||I.TOTAL_EXP);
+ END LOOP;
+END;
+
+EXECUTE EMP_DET(50);
+--===============================================================================
+SET SERVEROUTPUT ON
+CREATE OR REPLACE PROCEDURE EMP_CONTEXT(DID NUMBER)
+IS
+ CURSOR EMP_TEST 
+ IS
+  SELECT FIRST_NAME,LAST_NAME,SALARY
+  FROM EMPLOYEES 
+  WHERE DEPARTMENT_ID=DID;
+BEGIN
+  FOR I IN EMP_TEST
+  LOOP
+   DBMS_OUTPUT.PUT_LINE(I.FIRST_NAME||' '||I.LAST_NAME);
+  END LOOP;
+END;
+
+EXECUTE EMP_CONTEXT(60);
+--==============================================================================
+----Q1 .. pass joining_year along with exp  in procedure
+CREATE OR REPLACE PROCEDURE EMP_YEAR_EXP(HIRE_YEAR NUMBER)
+IS
+ CURSOR EMP_CON
+ IS
+SELECT 
+  FIRST_NAME,
+  LAST_NAME,
+  HIRE_DATE,
+  ROUND(MONTHS_BETWEEN(SYSDATE, HIRE_DATE) / 12, 0) AS TOTAL_EXP
+FROM 
+  EMPLOYEES
+WHERE 
+  EXTRACT(YEAR FROM HIRE_DATE) = HIRE_YEAR ;
+
+BEGIN
+   FOR I IN EMP_CON
+   LOOP
+    DBMS_OUTPUT.PUT_LINE(I.FIRST_NAME || ' ' || I.LAST_NAME || ' ' || I.TOTAL_EXP || ' ' || I.HIRE_DATE);
+   END LOOP;
+END;
+
+EXECUTE EMP_YEAR_EXP(2003);
+
+
+--===================================================================
+--Q2.. pass job_id , print manager details
+SET SERVEROUTPUT ON
+CREATE OR REPLACE PROCEDURE MANAGER_DET(JOBID VARCHAR2)
+IS
+CURSOR EMP_CONTEXT
+IS
+ SELECT 
+ E.FIRST_NAME AS MANAGER_NAME,
+ COUNT(*) AS CNT
+ FROM EMPLOYEES E JOIN EMPLOYEES M
+ ON(E.EMPLOYEE_ID=M.MANAGER_ID)
+ WHERE E.JOB_ID=JOBID
+ GROUP BY E.FIRST_NAME;
+
+  BEGIN
+   FOR p IN EMP_CONTEXT
+   LOOP
+    DBMS_OUTPUT.PUT_LINE(p.MANAGER_NAME||' '||p.CNT);
+   END LOOP;
+  END;
+
+EXECUTE MANAGER_DET('FI_MGR');
+
+SELECT *FROM EMPLOYEES;
+
+--==============================================================================
+-- Q3.. pass department_id and year_of_joining in procedure , calculate their experiecne, print salary hike
+SET SERVEROUTPUT ON
+CREATE OR REPLACE PROCEDURE EMP_DETAILS_JOIN(DID NUMBER, HD DATE)
+IS
+  CURSOR EMP_TEST IS
+    SELECT FIRST_NAME,
+           LAST_NAME,
+           SALARY,
+           HIRE_DATE,
+           ROUND(MONTHS_BETWEEN(SYSDATE, HIRE_DATE) / 12) AS EXP,
+           CASE
+             WHEN ROUND(MONTHS_BETWEEN(SYSDATE, HIRE_DATE) / 12) BETWEEN 1 AND 5 THEN SALARY * 1.15
+             WHEN ROUND(MONTHS_BETWEEN(SYSDATE, HIRE_DATE) / 12) BETWEEN 6 AND 10 THEN SALARY * 1.20
+             ELSE SALARY + (SALARY * 1.10)
+           END AS NEW_SAL
+    FROM EMPLOYEES
+    WHERE DEPARTMENT_ID = DID
+      AND HIRE_DATE = HD;
+
+BEGIN
+  FOR I IN EMP_TEST LOOP
+    DBMS_OUTPUT.PUT_LINE(I.FIRST_NAME || ' ' || I.LAST_NAME || ' ' || I.SALARY || ' ' || I.HIRE_DATE || ' ' || I.EXP || ' ' || I.NEW_SAL);
+  END LOOP;
+END;
+
+
+EXECUTE EMP_DETAILS_JOIN(90,'13-01-01');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
